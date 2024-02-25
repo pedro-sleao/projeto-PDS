@@ -6,7 +6,7 @@ clear;
 clc;
 
 // configurações iniciais
-filterType = "notch"; // "wFIR", "butt", "cheb1"
+filterType = "notch"; // "wFIR", "butt", "cheb1", "notch"
 windowType = "kr"; // "re", "kr", "tr"
 
 [y, Fsm, bits] = wavread("EnjoyTheSilence.wav");
@@ -65,9 +65,13 @@ elseif filterType == "notch" then
     wc2 = 2*%pi*5000/Fsm;
     
     // Filtro IIR notch de quarta ordem
-    num = conv([1, -2*cos(wc2), 1], conv([1, -2*cos(wc1), 1], [1, -2*cos(wc1), 1]));
-    den = conv([1, -2*r*cos(wc2), r^2], conv([1, -2*r*cos(wc1), r^2], [1, -2*r*cos(wc1), r^2]));
-
+    
+    //num = conv([1, -2*cos(wc2), 1], conv([1, -2*cos(wc1), 1], [1, -2*cos(wc1), 1]));
+    //den = conv([1, -2*r*cos(wc2), r^2], conv([1, -2*r*cos(wc1), r^2], [1, -2*r*cos(wc1), r^2]));
+    
+    num = [1, -(2*cos(wc1) + 2*cos(wc2)), (2 + 4*cos(wc1)*cos(wc2)), -(2*cos(wc1) + 2*cos(wc2)), 1];
+    den = [1, -(2*r*cos(wc1) + 2*r*cos(wc2)), (2*r^2 + 4*r^2*cos(wc1)*cos(wc2)), -(2*r^3*cos(wc1) + 2*r^3*cos(wc2)), r^4];
+ 
     y_filtered = filter(num, den, y);
 end
 
@@ -80,6 +84,7 @@ Y_filtered = fft(y_filtered);
 
 fk1 = (0:length(Y)-1)*Fsm/length(Y);
 fk2 = (0:length(Y_filtered)-1)*Fsm/length(Y_filtered);
+
 
 subplot(322);
 plot2d(fr*Fsm, hzm);
