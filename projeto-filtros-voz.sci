@@ -6,7 +6,7 @@ clear;
 clc;
 
 // configurações iniciais
-filterType = "notch"; // "wFIR", "butt", "cheb1", "notch"
+filterType = "wFIR"; // "wFIR", "butt", "cheb1", "notch"
 windowType = "kr"; // "re", "kr", "tr"
 
 [y, Fsm, bits] = wavread("EnjoyTheSilence.wav");
@@ -36,7 +36,8 @@ if filterType == "wFIR" then
     //
     
     n = linspace(0, M, M+1);
-    hd = (sin(%pi*(n - M/2)) - sin(wc*(n - M/2)))./(%pi*(n-M/2));
+    hd = (sin(%pi*(n - M/2)) - sin(wc*(n - M/2)))./(%pi*(n-M/2)); // Passa-alta
+    //hd = sin(wc*(n - M/2))./(%pi*(n - M/2)); // Passa-baixa
     h = hd .* window(windowType, M+1, B);
     
     y_filtered = conv2(y, h);
@@ -76,7 +77,7 @@ elseif filterType == "notch" then
 end
 
 
-[hzm, fr] = frmag(num, den, 256); // num, den para filtro notch e h para o resto.
+[hzm, fr] = frmag(h, 256); // num, den para filtro notch e h para o resto.
 hzm_db = 20*log10(hzm)./max(hzm);
 
 Y = fft(y);
@@ -84,7 +85,6 @@ Y_filtered = fft(y_filtered);
 
 fk1 = (0:length(Y)-1)*Fsm/length(Y);
 fk2 = (0:length(Y_filtered)-1)*Fsm/length(Y_filtered);
-
 
 subplot(322);
 plot2d(fr*Fsm, hzm);
@@ -119,4 +119,4 @@ xlabel("Tempo (s)");
 ylabel("Magnitude");
 
 playsnd(y_filtered, Fsm);
-//wavwrite(2*y_filtered, Fsm, "PDS_MUSICA_FILTRADA.wav")
+//wavwrite(3*y_filtered, Fsm, "PDS_MUSICA_PASSABAIXA.wav")
