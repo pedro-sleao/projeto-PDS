@@ -61,9 +61,9 @@ elseif filterType == "cheb1" then
     [y_filtered, zf] = filter(num, den, y)
     
 elseif filterType == "notch" then
-    r = 0.99;
-    wc1 = 2*%pi*3000/Fsm;
-    wc2 = 2*%pi*5000/Fsm;
+    r = 0.1;
+    wc1 = 2*%pi*100/Fsm;
+    wc2 = 2*%pi*3000/Fsm;
     
     // Filtro IIR notch de quarta ordem
     
@@ -87,7 +87,7 @@ fk1 = (0:length(Y)-1)*Fsm/length(Y);
 fk2 = (0:length(Y_filtered)-1)*Fsm/length(Y_filtered);
 
 subplot(322);
-plot2d(fr*Fsm, hzm);
+plot2d(fr*Fsm, hzm_db);
 title(gettext("Resposta na frequência"));
 xlabel("f");
 ylabel("Magnitude em db");
