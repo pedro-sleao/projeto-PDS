@@ -6,10 +6,10 @@ clear;
 clc;
 
 // configurações iniciais
-filterType = "wFIR"; // "wFIR", "butt", "cheb1", "notch"
+filterType = "cheb1"; // "wFIR", "butt", "cheb1", "notch"
 windowType = "kr"; // "re", "kr", "tr"
 
-[y, Fsm, bits] = wavread("EnjoyTheSilence.wav");
+[y, Fsm, bits] = wavread("/home/hpsilva/Documents/projeto-PDS/EnjoyTheSilence.wav");
 y = y(1,:);
 
 // Constantes
@@ -36,7 +36,8 @@ if filterType == "wFIR" then
     //
     
     n = linspace(0, M, M+1);
-    hd = (sin(%pi*(n - M/2)) - sin(wc*(n - M/2)))./(%pi*(n-M/2)); // Passa-alta
+    //hd = (sin(%pi*(n - M/2)) - sin(wc*(n - M/2)))./(%pi*(n-M/2)); // Passa-alta
+    hd = sinc(%pi*(n-M/2)) - (wc/%pi) *sinc(wc*(n-M/2));
     //hd = sin(wc*(n - M/2))./(%pi*(n - M/2)); // Passa-baixa
     h = hd .* window(windowType, M+1, B);
     
@@ -61,7 +62,7 @@ elseif filterType == "cheb1" then
     [y_filtered, zf] = filter(num, den, y)
     
 elseif filterType == "notch" then
-    r = 0.1;
+    r = 0.5;
     wc1 = 2*%pi*100/Fsm;
     wc2 = 2*%pi*3000/Fsm;
     
@@ -77,7 +78,7 @@ elseif filterType == "notch" then
 end
 
 
-[hzm, fr] = frmag(h, 256); // num, den para filtro notch e h para o resto.
+[hzm, fr] = frmag(num, den, 256); // num, den para filtro notch e h para o resto.
 hzm_db = 20*log10(hzm)./max(hzm);
 
 Y = fft(y);
