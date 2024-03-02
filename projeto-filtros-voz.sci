@@ -6,7 +6,7 @@ clear;
 clc;
 
 // configurações iniciais
-filterType = "notch"; // "wFIR", "butt", "cheb1", "notch"
+filterType = "wFIR"; // "wFIR", "butt", "cheb1", "notch"
 windowType = "kr"; // "re", "kr", "tr"
 
 [y, Fsm, bits] = wavread("EnjoyTheSilence.wav");
@@ -50,21 +50,21 @@ if filterType == "wFIR" then
     ylabel("h[n]");
     
 elseif filterType == "butt" then
-    h = iir(25, 'hp', filterType, (200+fc)/Fsm, [0 0]); // verificar parâmetros com GILSON
+    h = iir(15, 'hp', filterType, fc/Fsm, [0 0]); // verificar parâmetros com GILSON
     num = flipdim(coeff(h.num), 2);
     den = flipdim(coeff(h.den), 2);
     [y_filtered, zf] = filter(num, den, y)
     
 elseif filterType == "cheb1" then
-    h = iir(25, 'hp', filterType, (200+fc)/Fsm, [.001 0]); // verificar parâmetros com GILSON
+    h = iir(15, 'hp', filterType, fc/Fsm, [.001 0]); // verificar parâmetros com GILSON
     num = flipdim(coeff(h.num), 2);
     den = flipdim(coeff(h.den), 2);
     [y_filtered, zf] = filter(num, den, y)
     
 elseif filterType == "notch" then
-    r = 0.5;
-    wc1 = 2*%pi*100/Fsm;
-    wc2 = 2*%pi*3000/Fsm;
+    r = 0.1;
+    wc1 = 2*%pi*110/Fsm;
+    wc2 = 2*%pi*220/Fsm;
     
     // Filtro IIR notch de quarta ordem
     
@@ -92,7 +92,7 @@ elseif filterType == "notch" then
 end
 
 
-[hzm, fr] = frmag(num, den, 256); // num, den para filtro notch e h para o resto.
+[hzm, fr] = frmag(h, 256); // num, den para filtro notch e h para o resto.
 hzm_db = 20*log10(hzm)./max(hzm);
 
 Y = fft(y);
